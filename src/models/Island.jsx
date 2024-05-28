@@ -6,14 +6,15 @@ Source: https://sketchfab.com/3d-models/foxs-islands-163b68e09fcc47618450150be77
 Title: Fox's islands
 */
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { events , useFrame, useThree } from "@react-three/fiber";
 import islandScene from "../assets/3d/island.glb";
 import { a } from "@react-spring/three";
 
 const Island = ({ isRotating, setIsRotating, ...props }) => {
   const islandRef = useRef();
+  const [currentStage, setCurrentStage] = useState(null);
 
   const { gl, viewport } = useThree();
   const { nodes, materials } = useGLTF(islandScene);
@@ -22,26 +23,28 @@ const Island = ({ isRotating, setIsRotating, ...props }) => {
   const rotationSpeed = useRef(0);
   const dampingFactor = 0.95;
 
-  const handlePointerDown = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handlePointerDown = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
     setIsRotating(true);
 
-    const clientX = event.touches ? event.touches[0].clientX : e.clientX;
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
     lastX.current = clientX;
     rotationSpeed.current = delta * 0.01 * Maths.PI;
   };
-  const handlePointerUp = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+
+  const handlePointerUp = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
     setIsRotating(false);
   };
-  const handlePointerMove = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+
+  const handlePointerMove = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
 
     if(isRotating){
-      const clientX = event.touches ? event.touches[0].clientX : e.clientX;
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
 
       const delta = (clientX - lastX.current) / viewport.width;
 
@@ -53,33 +56,53 @@ const Island = ({ isRotating, setIsRotating, ...props }) => {
   };
 
   const handleKeyDown = (e) => {
-    if(e.key === 'Arrowleft') {
+    if(events.key === 'Arrowleft') {
       if(!isRotating) setIsRotating(true);
       islandRef.current.rotation.y += 0.01 * Math.PI;
-    } else if(e.key === 'ArrowRight') {
+    } else if(events.key === 'ArrowRight') {
       if(!isRotating) setIsRotating(true);
       islandRef.current.rotation.y -= 0.01 * Math.PI;
     }
-  }
+  };
 
   const handleKeyUp = (e) => {
-    if(e.key === 'Arrowleft' || e.key === 'ArrowRight') {
+    if(events.key === 'Arrowleft' || events.key === 'ArrowRight') {
       setIsRotating(false);
     }
+  };
+
+
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    canvas.addEventListener('pointerup', handlePointerUp);
+    canvas.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+  return () => {
+    canvas.removeEventListener('pointerdown', handlePointerDown);
+    canvas.removeEventListener('pointerup', handlePointerUp);
+    canvas.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
   }
+  },[gl, handlePointerDown, handlePointerUp, handlePointerMove]);
 
   useFrame(() => {
-    if(!isRotating) {
+    if (!isRotating) {
       rotationSpeed.current *= dampingFactor;
 
-      if(Math.abs(rotationSpeed.current) < 0.01) {
+      if (Math.abs(rotationSpeed.current) < 0.001) {
         rotationSpeed.current = 0;
       }
-
+      
       islandRef.current.rotation.y += rotationSpeed.current;
     } else {
       const rotation = islandRef.current.rotation.y;
-      const normalizedRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const normalizedRotation =
+        ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       switch (true) {
         case normalizedRotation >= 5.45 && normalizedRotation <= 5.85:
           setCurrentStage(4);
@@ -97,24 +120,7 @@ const Island = ({ isRotating, setIsRotating, ...props }) => {
           setCurrentStage(null);
       }
     }
-  })
-
-  useEffect(() => {
-    const canvas = gl.domElement;
-    canvas.addEventListener('pointerdown', handlePointerDown);
-    canvas.addEventListener('pointerup', handlePointerUp);
-    canvas.addEventListener('pointermove', handlePointerMove);
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-
-  return () => {
-    canvas.removeEventListener('pointerdown', handlePointerDown);
-    canvas.removeEventListener('pointerup', handlePointerUp);
-    canvas.removeEventListener('pointermove', handlePointerMove);
-    document.removeEventListener('keydown', handleKeyDown);
-    document.removeEventListener('keyup', handleKeyUp);
-  }
-  },[gl, handlePointerDown, handlePointerUp, handlePointerMove])
+  });
 
   return (
     <a.group ref={islandRef} {...props} dispose={null}>
