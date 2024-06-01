@@ -22,14 +22,13 @@ const Island = ({ isRotating, setIsRotating, setCurrentStage,...props }) => {
   const rotationSpeed = useRef(0);
   const dampingFactor = 0.95;
 
-  const handlePointerDown = (event,) => {
+  const handlePointerDown = (event,delta,_) => {
     event.stopPropagation();
     event.preventDefault();
     setIsRotating(true);
 
     const clientX = event.touches ? event.touches[0].clientX : event.clientX;
     lastX.current = clientX;
-    rotationSpeed.current = delta * 0.01 * Maths.PI;
   };
 
   const handlePointerUp = (event) => {
@@ -74,7 +73,7 @@ const Island = ({ isRotating, setIsRotating, setCurrentStage,...props }) => {
 
   useEffect(() => {
     const canvas = gl.domElement;
-    canvas.addEventListener('pointerdown', handlePointerDown);
+    canvas.addEventListener('pointerdown',(e) => handlePointerDown(e,0.5));
     canvas.addEventListener('pointerup', handlePointerUp);
     canvas.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('keydown', handleKeyDown);
