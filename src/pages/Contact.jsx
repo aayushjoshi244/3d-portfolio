@@ -2,13 +2,14 @@ import React, { useRef, useState } from "react";
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
-  const formRef = useRef(null);
+  const formRef = useRef();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
-    set({...form, [e.target.name]: e.target.value});
+  const handleChange = ({ target: { name, value } }) => {
+    setForm({ ...form, [name]: value });
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -32,13 +33,14 @@ const Contact = () => {
       setIsLoading(false);
       console.log(error);
       // TODO: Show error message
-    })
+    });
   };
+
   const handleFocus = () => {};
   const handleBlur = () => {};
 
   return (
-    <section className="relative felx lg:flex-row flex-col max-container">
+    <section className="relative flex lg:flex-row flex-col max-container">
       <div className="flex-1 min-w-[50%] flex flex-col">
         <h1 className="head-text">Get in Touch</h1>
         <form className="w-full flex flex-col gap-7 mt-14" onSubmit={handleSubmit}>
@@ -76,9 +78,9 @@ const Contact = () => {
               name="message"
               rows={4}
               className="textarea"
-              placeholder="Let Me know how can Y help you!"
+              placeholder="Let me know how I can help you!"
               required
-              value={form.message}
+              defaultValue={form.message}
               onChange={handleChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
