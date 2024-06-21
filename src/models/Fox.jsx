@@ -6,13 +6,22 @@ Source: https://sketchfab.com/3d-models/fox-f372c04de44640fbb6a4f9e4e5845c78
 Title: Fox
 */
 
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
+import scene from '../assets/3d/fox.glb'
 
-export function Model(props) {
-  const group = useRef()
-  const { nodes, materials, animations } = useGLTF('/fox.glb')
-  const { actions } = useAnimations(animations, group)
+const Fox = ({ currentAnimation, ...props}) => {
+  const group = useRef();
+  const { nodes, materials, animations } = useGLTF(scene);
+  const { actions } = useAnimations(animations, group);
+
+  useEffect(() => {
+    Object.values(actions).forEach((actions) => actions.stop);
+
+    if(actions[currentAnimation]) {
+        actions[currentAnimation].play();
+    }
+  }, [actions, currentAnimation])
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Sketchfab_Scene">
@@ -52,4 +61,5 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/fox.glb')
+
+export default Fox;
