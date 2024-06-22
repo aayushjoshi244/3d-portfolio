@@ -4,6 +4,7 @@ import {
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { skills, experiences } from "../constants";
+import CTA from "../components/CTA";
 
 const About = () => {
   return (
@@ -48,13 +49,13 @@ const About = () => {
       <div className="py-16">
         <h3 className="subhead-text">Work Experience</h3>
         <div className="mt-5 flex flex-col gap-3 text-slate-500">
-          <p>
-            <h1 className="text-bold text-blue-500">
+          <div>
+            <p className="font-bold text-blue-500">
               Student Coordinator and Graphic Designer
-            </h1>
-            <h1 className="text-bold text-blue-500">
+            </p>
+            <p className="font-bold text-blue-500">
               Training and Placement Cell
-            </h1>
+            </p>
             Oversaw and coordinated placement activities, enhancing
             communication and organization between students and potential
             employers. Developed and designed promotional materials for campus
@@ -62,17 +63,17 @@ const About = () => {
             strategies.
             <br />
             <br />
-            <h1 className="text-bold text-blue-500">Freelance Developer</h1>
+            <p className="font-bold text-blue-500">Freelance Developer</p>
             Specialized in developing applications and tools using the MERN
             stack and Python, delivering enhanced functionality and user
             experience across multiple freelance projects.
             <br />
             <br />
-            <h1 className="text-bold text-blue-500">Professional Interests</h1>
+            <p className="font-bold text-blue-500">Professional Interests</p>
             Passionate about Artificial Intelligence, continuously exploring
             ways to integrate AI technologies with development projects to
             innovate and improve methodologies.
-          </p>
+          </div>
         </div>
         <div className="mt-12 flex">
           <VerticalTimeline>
@@ -88,6 +89,7 @@ const About = () => {
                       className="w-[60%] h-[60%] object-contain"
                     />
                   </div>}
+                  iconStyle={{ background: experience.iconBg }}
                 contentStyle={{
                   borderBottom: '8px',
                   borderStyle: 'solid',
@@ -121,6 +123,8 @@ const About = () => {
           </VerticalTimeline>
         </div>
       </div>
+      <hr className="border-slate-200"/>
+      <CTA />
     </section>
   );
 };
